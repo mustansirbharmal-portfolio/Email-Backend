@@ -29,7 +29,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const corsOptions = {
     origin: process.env.NODE_ENV === 'development' 
       ? ['http://localhost:5173', 'http://localhost:5000'] 
-      : ['https://frontend-new-email-agent.vercel.app'],
+      : ['https://frontend-new-email-agent.vercel.app', 'https://email-backend-lhx2.onrender.com'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
