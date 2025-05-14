@@ -8,7 +8,7 @@ export function initializeGmailService() {
   // Get environment variables for Google OAuth
   const clientId = process.env.GMAIL_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GMAIL_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET;
-  const callbackUrl = process.env.GMAIL_REDIRECT_URI || '/api/gmail/callback';
+  const callbackUrl = process.env.GMAIL_REDIRECT_URI || 'https://email-backend-lhx2.onrender.com/api/gmail/callback';
 
   // Validate required environment variables
   if (!clientId || !clientSecret) {
