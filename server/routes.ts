@@ -15,7 +15,10 @@ import { setupScheduler } from "./services/scheduler";
 import { connectToMongoDB, getMongoDb } from "./services/mongodb";
 
 // MongoDB configuration
-const DB_URL = process.env.DB_URL || process.env.MONGODB_URI || "mongodb+srv://mustawork777:Mustan94885%23%23%23@biren-crm.3eczexv.mongodb.net/";
+const DB_URL = process.env.DB_URL || process.env.MONGODB_URI || "";
+if (!DB_URL) {
+  console.error("No MongoDB connection string provided. Please set DB_URL or MONGODB_URI environment variable.");
+}
 const DB_NAME = process.env.DB || "crm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -24,7 +27,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Configure CORS
   const corsOptions = {
-    origin: process.env.CORS_ORIGIN || '*', // In production, use the specific frontend URL
+    origin: process.env.CORS_ORIGIN || 'https://frontend-new-email-agent.vercel.app',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -242,10 +245,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Processing Gmail callback for user:", user.id);
 
       try {
-        // Connect directly to MongoDB to ensure the update happens
-        const mongoClient = new MongoClient(DB_URL);
-        await mongoClient.connect();
-        const db = mongoClient.db(DB_NAME);
+        // Get MongoDB connection
+        const db = getMongoDb();
         const collection = db.collection('users');
 
         // Get tokens from Google
@@ -257,7 +258,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           objectId = new ObjectId(user.id);
         } catch (err) {
           console.error("Invalid ObjectId format:", user.id);
-          await mongoClient.close();
           return res.redirect("/dashboard?gmailError=invalid_user_id");
         }
 
@@ -273,9 +273,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         );
 
-        await mongoClient.close();
-
-        if (updateResult.matchedCount === 0) {
+        if ((updateResult as any).matchedCount === 0 || updateResult.modifiedCount === 0) {
           console.error("No user found to update with Gmail connection");
           return res.redirect("/dashboard?gmailError=user_not_found");
         }
