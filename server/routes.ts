@@ -215,17 +215,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(401).json({ message: "Unauthorized" });
   };
 
-  // Gmail Auth routes
-  app.get("/api/gmail/auth", isAuthenticated, async (req: Request, res: Response) => {
+ // Gmail Auth routes
+  app.get("/api/gmail/auth", (req: Request, res: Response) => {
     try {
-      if (!req.user) {
-        return res.status(401).json({ message: "User not authenticated" });
+      console.log("Session data:", req.session);
+      console.log("Is authenticated:", req.isAuthenticated());
+
+      // Check if user is authenticated
+      if (!req.isAuthenticated()) {
+        console.error("User not authenticated");
+        return res.status(401).json({ error: "Authentication required" });
       }
+
       const authUrl = getGmailAuthUrl();
+      if (!authUrl) {
+        console.error("Failed to generate auth URL");
+        return res.status(500).json({ error: "Failed to generate auth URL" });
+      }
+
+      console.log("Generated auth URL:", authUrl);
       res.status(200).json({ authUrl });
     } catch (error) {
       console.error("Gmail auth error:", error);
-      res.status(500).json({ message: "Failed to get auth URL" });
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 
