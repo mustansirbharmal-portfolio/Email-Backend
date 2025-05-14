@@ -39,6 +39,11 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
+  // Add catch-all route handler
+  app.use('*', (req: Request, res: Response) => {
+    res.status(200).json({ message: 'Email campaign backend API is running' });
+  });
+
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
