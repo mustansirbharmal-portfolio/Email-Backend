@@ -216,9 +216,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   // Gmail Auth routes
-  app.get("/api/gmail/auth", isAuthenticated, (req: Request, res: Response) => {
-    const authUrl = getGmailAuthUrl();
-    res.status(200).json({ authUrl });
+  app.get("/api/gmail/auth", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const authUrl = getGmailAuthUrl();
+      res.status(200).json({ authUrl });
+    } catch (error) {
+      console.error("Gmail auth error:", error);
+      res.status(500).json({ message: "Failed to get auth URL" });
+    }
   });
 
   // Gmail callback route - exactly matches Google OAuth console configuration
