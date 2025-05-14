@@ -5,14 +5,26 @@ import { storage } from "../storage";
 let oauth2Client: any;
 
 export function initializeGmailService() {
-  // Use exact URL that's configured in Google OAuth Console
-  const callbackUrl = "https://cd5c2b62-cd4c-456b-80bc-602282e423e7-00-tj0qaxq73kkb.worf.replit.dev/api/gmail/callback";
+  // Get environment variables for Google OAuth
+  const clientId = process.env.GMAIL_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GMAIL_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET;
+  const callbackUrl = process.env.GMAIL_REDIRECT_URI || 'https://frontend-new-email-agent.vercel.app/dashboard';
+
+  // Validate required environment variables
+  if (!clientId || !clientSecret) {
+    console.error("Missing Gmail OAuth credentials. Please set GMAIL_CLIENT_ID and GMAIL_CLIENT_SECRET environment variables.");
+  }
+
+  if (!callbackUrl) {
+    console.error("Missing Gmail callback URL. Please set GMAIL_REDIRECT_URI environment variable.");
+  }
+
   console.log("Using Gmail OAuth callback URL:", callbackUrl);
   
   // Initialize OAuth2 client with Google API credentials
   oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID || "917247384580-ap6tqmd9r6m5f8nmkjlrf531cs1nto5g.apps.googleusercontent.com",
-    process.env.GOOGLE_CLIENT_SECRET || "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",
+    clientId,
+    clientSecret,
     callbackUrl
   );
 }
