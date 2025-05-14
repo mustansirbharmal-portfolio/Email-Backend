@@ -27,10 +27,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Configure CORS
   const corsOptions = {
-    origin: process.env.CORS_ORIGIN || 'https://frontend-new-email-agent.vercel.app',
+    origin: ['https://frontend-new-email-agent.vercel.app'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    exposedHeaders: ['set-cookie'],
   };
   app.use(cors(corsOptions));
 
